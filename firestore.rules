@@ -1,0 +1,87 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() && request.auth.token.admin == true;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function ownsChild(childId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/children/$(childId))
+        && get(/databases/$(database)/documents/children/$(childId)).data.parentId
+             == request.auth.uid;
+    }
+
+    match /users/{uid} {
+      allow read, update: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid);
+      allow delete: if isAdmin();
+
+      match /devices/{token} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    match /children/{childId} {
+      allow read, create, update, delete: if ownsChild(childId) || isAdmin();
+
+      match /progress/{lessonId} {
+        allow read, write: if ownsChild(childId) || isAdmin();
+      }
+
+      match /achievements/{badgeId} {
+        allow read, write: if ownsChild(childId) || isAdmin();
+      }
+    }
+
+    match /stories/{storyId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /coloringPages/{pageId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /badges/{badgeId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /subscriptionPlans/{planId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /schools/{schoolId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /payments/{paymentId} {
+      allow read: if signedIn() && resource.data.userId == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'pending';
+      allow update, delete: if false;
+    }
+
+    match /analytics/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
