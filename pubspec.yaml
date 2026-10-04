@@ -1,0 +1,28 @@
+name: kids_platform
+description: منصة تعليمية آمنة للأطفال
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: ^4.0.0
+  firebase_auth: ^6.0.0
+  cloud_firestore: ^6.0.0
+  firebase_storage: ^13.0.0
+  cloud_functions: ^6.0.0
+  firebase_messaging: ^16.0.0
+  flutter_riverpod: ^2.6.1
+  go_router: ^16.0.0
+  google_fonts: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
