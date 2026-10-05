@@ -39,9 +39,8 @@ class _ParentHomeState extends State<ParentHome> {
   }
 
   Future<void> _deleteChild(String id) async {
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
+    final ok = await showDialog<bool>(context: context, builder: (context) =>
+      AlertDialog(
         title: const Text('حذف ملف الطفل؟'),
         content: const Text('سيتم حذف ملف الطفل وتقدمه المرتبط به.'),
         actions: [
@@ -50,12 +49,7 @@ class _ParentHomeState extends State<ParentHome> {
         ],
       ));
     if (ok != true) return;
-    try {
-      await FirebaseFirestore.instance.collection('children').doc(id).delete();
-    } on FirebaseException catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تعذر حذف الملف: \${e.message ?? e.code}')));
-    }
+    await FirebaseFirestore.instance.collection('children').doc(id).delete();
   }
 
   @override Widget build(BuildContext context) {
@@ -69,8 +63,7 @@ class _ParentHomeState extends State<ParentHome> {
         body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
           stream: _childrenStream(user.uid),
           builder: (context, snapshot) {
-            if (snapshot.hasError) return const Center(
-              child: Text('تعذر تحميل ملفات الأطفال.'));
+            if (snapshot.hasError) return const Center(child: Text('تعذر تحميل ملفات الأطفال.'));
             if (snapshot.connectionState == ConnectionState.waiting)
               return const Center(child: CircularProgressIndicator());
             final children = snapshot.data?.docs ?? [];
@@ -97,8 +90,7 @@ class _ParentHomeState extends State<ParentHome> {
                     const SizedBox(height: 12),
                     Text('لا يوجد طفل بعد', style: Theme.of(context).textTheme.titleLarge),
                     const SizedBox(height: 8),
-                    const Text('ابدأ بإضافة أول ملف طفل للانتقال إلى المرحلة التعليمية.',
-                      textAlign: TextAlign.center),
+                    const Text('ابدأ بإضافة أول ملف طفل للانتقال إلى المرحلة التعليمية.', textAlign: TextAlign.center),
                     const SizedBox(height: 18),
                     FilledButton.icon(onPressed: () => _openChild(),
                       icon: const Icon(Icons.add), label: const Text('إضافة أول طفل')),
@@ -110,24 +102,22 @@ class _ParentHomeState extends State<ParentHome> {
                     title: Text((doc.data()['name'] ?? 'بدون اسم').toString()),
                     subtitle: Text('سنة الميلاد: \${doc.data()['birthYear'] ?? '—'} • \${doc.data()['gender'] ?? 'غير محدد'}'),
                     trailing: Wrap(children: [
-                      IconButton(onPressed: () => _openChild(id: doc.id, data: doc.data()),
-                        icon: const Icon(Icons.edit_outlined)),
-                      IconButton(onPressed: () => _deleteChild(doc.id),
-                        icon: const Icon(Icons.delete_outline)),
+                      IconButton(onPressed: () => _openChild(id: doc.id, data: doc.data()), icon: const Icon(Icons.edit_outlined)),
+                      IconButton(onPressed: () => _deleteChild(doc.id), icon: const Icon(Icons.delete_outline)),
                     ]),
                   ),
                 )),
                 const SizedBox(height: 12),
-                Card(child: ListTile(
-                  leading: const Icon(Icons.school_outlined),
-                  title: const Text('المحتوى التعليمي'),
-                  subtitle: const Text('سيظهر هنا محتوى الطفل بعد ربط الدروس بملفه.'),
-                  trailing: const Icon(Icons.lock_outline))),
-                Card(child: ListTile(
-                  leading: const Icon(Icons.credit_card_outlined),
-                  title: const Text('الاشتراك'),
-                  subtitle: const Text('حالة الاشتراك ستظهر هنا عند تفعيل نظام الدفع.'),
-                  trailing: const Chip(label: Text('غير مفعل')))),
+                const Card(child: ListTile(
+                  leading: Icon(Icons.school_outlined),
+                  title: Text('المحتوى التعليمي'),
+                  subtitle: Text('سيظهر هنا محتوى الطفل بعد ربط الدروس بملفه.'),
+                  trailing: Icon(Icons.lock_outline))),
+                const Card(child: ListTile(
+                  leading: Icon(Icons.credit_card_outlined),
+                  title: Text('الاشتراك'),
+                  subtitle: Text('حالة الاشتراك ستظهر هنا عند تفعيل نظام الدفع.'),
+                  trailing: Chip(label: Text('غير مفعل')))),
               ]),
             ));
           },
