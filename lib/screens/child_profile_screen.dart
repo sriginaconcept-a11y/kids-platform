@@ -49,7 +49,7 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
       if (!editing) data['createdAt'] = FieldValue.serverTimestamp();
       await ref.set(data, SetOptions(merge: editing));
       if (mounted) Navigator.of(context).pop(true);
-    } on FirebaseException catch (e) {
+    } on FirebaseException {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('تعذر حفظ ملف الطفل: \${e.message ?? e.code}')));
     } finally {
@@ -89,7 +89,7 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: _gender,
+              initialValue: _gender,
               decoration: const InputDecoration(labelText: 'الجنس', border: OutlineInputBorder()),
               items: const [
                 DropdownMenuItem(value: 'غير محدد', child: Text('غير محدد')),
